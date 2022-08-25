@@ -1,9 +1,18 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Scanner;
+
 public class GameBoard {
     private final int gameBoardWidth = 9;
     private final int gameBoardHeight = 9;
-    private char[][] gameBoard = new char[gameBoardWidth][gameBoardHeight];
+    private char[] gameBoard = new char[gameBoardWidth * gameBoardHeight];
+    private ArrayList<Integer> mineIndices = new ArrayList<>();
+
+    // get [userInput] random numbers between 0 and [gameBoardWidth * gameBoardHeight]
 
     public GameBoard() {
+        getUserInput();
         initializeGameBoard();
         printGameBoard();
     }
@@ -12,41 +21,74 @@ public class GameBoard {
 
     private void initializeGameBoard() {
 
-        char[][] newGameBoard = new char[gameBoardWidth][gameBoardHeight];
+        char[] newGameBoard = new char[gameBoardWidth * gameBoardHeight];
 
-        for (int i = 0; i < newGameBoard.length; i++) {
-            for (int j = 0; j < newGameBoard[i].length; j++) {
-                // use two different symbols to pass test
-                if (j % 2 == 0) {
-                    newGameBoard[i][j] = '.';
-                } else {
-                    newGameBoard[i][j] = 'X';
-                }
-            }
+        Arrays.fill(newGameBoard, '.');
+
+        for (int index : getMineIndices()) {
+            newGameBoard[index] = 'X';
         }
+
         setGameBoard(newGameBoard);
     }
 
     private void printGameBoard() {
+
+        int rowTracker = 0;
         for (int i = 0; i < getGameBoard().length; i++) {
-            for (int j = 0; j < getGameBoard()[i].length; j++) {
-                System.out.print(getGameBoard()[i][j]);
-            }
-            // don't print new line after the last row
-            if (i != getGameBoard().length - 1) {
+            rowTracker++;
+            System.out.print(getGameBoard()[i]);
+            // print new line for all but the last row
+            if (rowTracker % 9 == 0 && i != getGameBoard().length - 1) {
                 System.out.println();
             }
         }
     }
 
+    // get user input for mines
+
+    private void getUserInput() {
+        System.out.println("How many mines do you want on the field?");
+
+        Scanner scanner = new Scanner(System.in);
+
+        int numOfMines = scanner.nextInt();
+
+        generateMines(numOfMines);
+    }
+
+    private void generateMines(int numOfMines) {
+        Random random = new Random();
+        int upperBound = gameBoardWidth * gameBoardHeight;
+
+        ArrayList<Integer> newMineIndices = new ArrayList<>();
+
+        while (newMineIndices.size() != numOfMines) {
+            int currentRandomNumber = random.nextInt(upperBound);
+            if (!newMineIndices.contains(currentRandomNumber)) {
+                newMineIndices.add(currentRandomNumber);
+            }
+        }
+
+        setMineIndices(newMineIndices);
+    }
+
     // getters and setters
 
-    public char[][] getGameBoard() {
+    private char[] getGameBoard() {
         return gameBoard;
     }
 
-    public void setGameBoard(char[][] gameBoard) {
+    private void setGameBoard(char[] gameBoard) {
         this.gameBoard = gameBoard;
+    }
+
+    private ArrayList<Integer> getMineIndices() {
+        return mineIndices;
+    }
+
+    private void setMineIndices(ArrayList<Integer> mineIndices) {
+        this.mineIndices = mineIndices;
     }
 }
 

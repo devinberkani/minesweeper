@@ -35,15 +35,35 @@ public class GameBoard {
 
     private void printGameBoard() {
 
-        int rowTracker = 0;
+        // print top of game board
+
+        System.out.println(" |123456789|");
+        System.out.println("-|---------|");
+        String borderSymbol = "|";
+
+        int rowNumber = 1;
+        int endOfRowTracker = 0;
         for (int i = 0; i < getGameBoard().length; i++) {
-            rowTracker++;
+
+            // print start of each row
+            if (i % gameBoardWidth == 0) {
+                System.out.print(rowNumber);
+                System.out.print(borderSymbol);
+                rowNumber++;
+            }
+
+            // print game board
             System.out.print(getGameBoard()[i]);
-            // print new line for all but the last row
-            if (rowTracker % gameBoardWidth == 0 && i != getGameBoard().length - 1) {
-                System.out.println();
+
+            // print end of each row
+            endOfRowTracker++;
+            if (endOfRowTracker % gameBoardWidth == 0) {
+                System.out.println(borderSymbol);
             }
         }
+
+        // print bottom of game board
+        System.out.print("-|---------|");
     }
 
     // get user input for mines

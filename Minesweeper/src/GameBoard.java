@@ -4,6 +4,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class GameBoard {
+    private static final Scanner scanner = new Scanner(System.in);
+    private boolean isGameOver;
     private final int gameBoardWidth = 9;
     private final int gameBoardHeight = 9;
     private char[] gameBoard = new char[gameBoardWidth * gameBoardHeight];
@@ -12,10 +14,20 @@ public class GameBoard {
     // get [userInput] random numbers between 0 and [gameBoardWidth * gameBoardHeight]
 
     public GameBoard() {
-        getUserInput();
+        getNumberOfMines();
         initializeGameBoard();
         updateGameBoardWithMines();
         printGameBoard();
+
+        while(!isGameOver) {
+//            System.out.println(getMineIndices());
+            getUserCoordinates();
+            printGameBoard();
+            setGameOver(getMineIndices().size() == 0);
+        }
+
+        // game won message
+        System.out.println("Congratulations! You found all the mines!");
     }
 
     // game board
@@ -63,15 +75,67 @@ public class GameBoard {
         }
 
         // print bottom of game board
-        System.out.print("-|---------|");
+        System.out.println("-|---------|");
+    }
+
+    // get user input for coordinates
+
+    private void getUserCoordinates() {
+
+        boolean coordinatesValid = false;
+
+        while (!coordinatesValid) {
+            System.out.print("Set/delete mines marks (x and y coordinates): ");
+
+            int coordinateOne = scanner.nextInt();
+            int coordinateTwo = scanner.nextInt();
+
+            int convertedCoordinate = gameBoardWidth * (coordinateTwo - 1) + (coordinateOne - 1);
+            char location = getGameBoard()[convertedCoordinate];
+
+            if (location == '*' || location == '.') {
+                coordinatesValid = true;
+                updateGameBoardWithCoordinates(convertedCoordinate);
+            } else {
+                System.out.println("There is a number here!");
+            }
+        }
+
+    }
+
+    private void updateGameBoardWithCoordinates(int coordinate) {
+        char[] updatedGameBoard = new char[gameBoardWidth * gameBoardHeight];
+
+        for (int i = 0; i < updatedGameBoard.length; i++) {
+            if (i == coordinate) {
+                if (getGameBoard()[i] == '*') {
+                    updatedGameBoard[i] = '.';
+                    if (getMineIndices().contains(coordinate)) {
+                        getMineIndices().remove(Integer.valueOf(coordinate));
+                    } else {
+                        getMineIndices().add(coordinate);
+                    }
+
+                } else {
+                    updatedGameBoard[i] = '*';
+                    if (getMineIndices().contains(coordinate)) {
+                        getMineIndices().remove(Integer.valueOf(coordinate));
+                    } else {
+                        getMineIndices().add(coordinate);
+                    }
+                }
+            } else {
+                updatedGameBoard[i] = getGameBoard()[i];
+            }
+        }
+
+        setGameBoard(updatedGameBoard);
     }
 
     // get user input for mines
 
-    private void getUserInput() {
+    private void getNumberOfMines() {
         System.out.println("How many mines do you want on the field?");
-
-        Scanner scanner = new Scanner(System.in);
 
         int numOfMines = scanner.nextInt();
 
@@ -99,7 +163,7 @@ public class GameBoard {
 
         for (int i = 0; i < updatedGameBoard.length; i++) {
             if (getGameBoard()[i] == 'X') {
-                updatedGameBoard[i] = getGameBoard()[i];
+                updatedGameBoard[i] = '.';
             } else {
                 int numOfMines = getNumberOfMines(i);
                 updatedGameBoard[i] = numOfMines == 0 ? getGameBoard()[i] : (char) (numOfMines + '0'); // converts int to char
@@ -341,6 +405,15 @@ public class GameBoard {
     }
 
     // getters and setters
+
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
+    }
 
     private char[] getGameBoard() {
         return gameBoard;

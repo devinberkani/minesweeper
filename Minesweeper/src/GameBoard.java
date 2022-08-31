@@ -9,20 +9,28 @@ public class GameBoard {
     private final int gameBoardWidth = 9;
     private final int gameBoardHeight = 9;
     private char[] gameBoard = new char[gameBoardWidth * gameBoardHeight];
+    private char[][] userGameBoard = new char[gameBoardWidth][gameBoardHeight];
     private ArrayList<Integer> mineIndices = new ArrayList<>();
 
-    // get [userInput] random numbers between 0 and [gameBoardWidth * gameBoardHeight]
+    // YOU ARE HERE **********
+    // user needs to be able to type mine or free as a part of input
+    // input should then modify only the user game board
+    // implement flood fill algorithm
+    // implement game over logic (if user finds all mines or if user steps on a mine)
+
 
     public GameBoard() {
         getNumberOfMines();
-        initializeGameBoard();
+        initializeGameBoards();
         updateGameBoardWithMines();
         printGameBoard();
+        printUserGameBoard();
 
         while(!isGameOver) {
 //            System.out.println(getMineIndices());
             getUserCoordinates();
             printGameBoard();
+            printUserGameBoard();
             setGameOver(getMineIndices().size() == 0);
         }
 
@@ -30,9 +38,46 @@ public class GameBoard {
         System.out.println("Congratulations! You found all the mines!");
     }
 
+    // user game board
+
+    private void initializeUserGameBoard() {
+        char[][] newGameBoard = new char[gameBoardWidth][gameBoardHeight];
+
+        for (char[] chars : newGameBoard) {
+            Arrays.fill(chars, '.');
+        }
+
+        setUserGameBoard(newGameBoard);
+    }
+
+    private void printUserGameBoard() {
+        // print top of game board
+
+        System.out.println(" |123456789|");
+        System.out.println("-|---------|");
+        String borderSymbol = "|";
+
+        int rowNumber = 1;
+
+        for (int i = 0; i < getUserGameBoard().length; i++) {
+            System.out.print(rowNumber);
+            System.out.print(borderSymbol);
+            rowNumber++;
+            for (int j = 0; j < getUserGameBoard()[i].length; j++) {
+                System.out.print(getUserGameBoard()[i][j]);
+            }
+            System.out.println(borderSymbol);
+        }
+
+        // print bottom of game board
+        System.out.println("-|---------|");
+    }
+
     // game board
 
-    private void initializeGameBoard() {
+    private void initializeGameBoards() {
+
+        initializeUserGameBoard();
 
         char[] newGameBoard = new char[gameBoardWidth * gameBoardHeight];
 
@@ -429,5 +474,13 @@ public class GameBoard {
 
     private void setMineIndices(ArrayList<Integer> mineIndices) {
         this.mineIndices = mineIndices;
+    }
+
+    public char[][] getUserGameBoard() {
+        return userGameBoard;
+    }
+
+    public void setUserGameBoard(char[][] userGameBoard) {
+        this.userGameBoard = userGameBoard;
     }
 }

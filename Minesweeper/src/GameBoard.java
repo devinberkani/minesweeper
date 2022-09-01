@@ -13,6 +13,7 @@ public class GameBoard {
     private ArrayList<Integer> mineIndices = new ArrayList<>();
 
     // YOU ARE HERE **********
+    // go through each example case and implement functionality as you go
     // user needs to be able to type mine or free as a part of input
     // input should then modify only the user game board
     // implement flood fill algorithm
@@ -28,7 +29,7 @@ public class GameBoard {
 
         while(!isGameOver) {
 //            System.out.println(getMineIndices());
-            getUserCoordinates();
+            getUserInput();
             printGameBoard();
             printUserGameBoard();
             setGameOver(getMineIndices().size() == 0);
@@ -125,7 +126,7 @@ public class GameBoard {
 
     // get user input for coordinates
 
-    private void getUserCoordinates() {
+    private void getUserInput() {
 
         boolean coordinatesValid = false;
 
@@ -134,13 +135,17 @@ public class GameBoard {
 
             int coordinateOne = scanner.nextInt();
             int coordinateTwo = scanner.nextInt();
+            String freeOrMine = scanner.next();
 
             int convertedCoordinate = gameBoardWidth * (coordinateTwo - 1) + (coordinateOne - 1);
             char location = getGameBoard()[convertedCoordinate];
 
             if (location == '*' || location == '.') {
-                coordinatesValid = true;
-                updateGameBoardWithCoordinates(convertedCoordinate);
+                // input only valid if it is equal to free or mine
+                if (freeOrMine.equalsIgnoreCase("free") || freeOrMine.equalsIgnoreCase("mine")) {
+                    coordinatesValid = true;
+                    updateGameBoardWithCoordinates(convertedCoordinate);
+                }
             } else {
                 System.out.println("There is a number here!");
             }

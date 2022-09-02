@@ -6,79 +6,17 @@ import java.util.Scanner;
 public class GameBoard {
     private static final Scanner scanner = new Scanner(System.in);
     private boolean isGameOver;
-    private final int gameBoardWidth = 9;
-    private final int gameBoardHeight = 9;
+    protected final int gameBoardWidth = 9;
+    protected final int gameBoardHeight = 9;
     private char[] gameBoard = new char[gameBoardWidth * gameBoardHeight];
-    private char[][] userGameBoard = new char[gameBoardWidth][gameBoardHeight];
     private ArrayList<Integer> mineIndices = new ArrayList<>();
 
-    // YOU ARE HERE **********
-    // go through each example case and implement functionality as you go
-    // user needs to be able to type mine or free as a part of input
-    // input should then modify only the user game board
-    // implement flood fill algorithm
-    // implement game over logic (if user finds all mines or if user steps on a mine)
-
-
     public GameBoard() {
-        getNumberOfMines();
-        initializeGameBoards();
-        updateGameBoardWithMines();
-        printGameBoard();
-        printUserGameBoard();
-
-        while(!isGameOver) {
-//            System.out.println(getMineIndices());
-            getUserInput();
-            printGameBoard();
-            printUserGameBoard();
-            setGameOver(getMineIndices().size() == 0);
-        }
-
-        // game won message
-        System.out.println("Congratulations! You found all the mines!");
-    }
-
-    // user game board
-
-    private void initializeUserGameBoard() {
-        char[][] newGameBoard = new char[gameBoardWidth][gameBoardHeight];
-
-        for (char[] chars : newGameBoard) {
-            Arrays.fill(chars, '.');
-        }
-
-        setUserGameBoard(newGameBoard);
-    }
-
-    private void printUserGameBoard() {
-        // print top of game board
-
-        System.out.println(" |123456789|");
-        System.out.println("-|---------|");
-        String borderSymbol = "|";
-
-        int rowNumber = 1;
-
-        for (int i = 0; i < getUserGameBoard().length; i++) {
-            System.out.print(rowNumber);
-            System.out.print(borderSymbol);
-            rowNumber++;
-            for (int j = 0; j < getUserGameBoard()[i].length; j++) {
-                System.out.print(getUserGameBoard()[i][j]);
-            }
-            System.out.println(borderSymbol);
-        }
-
-        // print bottom of game board
-        System.out.println("-|---------|");
     }
 
     // game board
 
-    private void initializeGameBoards() {
-
-        initializeUserGameBoard();
+    protected void initializeGameBoard() {
 
         char[] newGameBoard = new char[gameBoardWidth * gameBoardHeight];
 
@@ -91,7 +29,7 @@ public class GameBoard {
         setGameBoard(newGameBoard);
     }
 
-    private void printGameBoard() {
+    protected void printGameBoard() {
 
         // print top of game board
 
@@ -124,54 +62,53 @@ public class GameBoard {
         System.out.println("-|---------|");
     }
 
-    // get user input for coordinates
+    protected boolean userSteppedOnMine(int convertedCoordinate) {
 
-    private void getUserInput() {
-
-        boolean coordinatesValid = false;
-
-        while (!coordinatesValid) {
-            System.out.print("Set/delete mines marks (x and y coordinates): ");
-
-            int coordinateOne = scanner.nextInt();
-            int coordinateTwo = scanner.nextInt();
-            String freeOrMine = scanner.next();
-
-            int convertedCoordinate = gameBoardWidth * (coordinateTwo - 1) + (coordinateOne - 1);
-            char location = getGameBoard()[convertedCoordinate];
-
-            if (location == '*' || location == '.') {
-                // input only valid if it is equal to free or mine
-                if (freeOrMine.equalsIgnoreCase("free") || freeOrMine.equalsIgnoreCase("mine")) {
-                    coordinatesValid = true;
-                    updateGameBoardWithCoordinates(convertedCoordinate);
-                }
-            } else {
-                System.out.println("There is a number here!");
+        for (int mineIndex: getMineIndices()) {
+            if (convertedCoordinate == mineIndex) {
+                return true;
             }
         }
-
+        return false;
     }
 
-    private void updateGameBoardWithCoordinates(int coordinate) {
+    protected boolean checkUserInputs(int convertedCoordinate, String freeOrMine) {
+
+        // check for index out of bounds
+        if (convertedCoordinate < 0 || convertedCoordinate >= getGameBoard().length) {
+            System.out.println("You have entered an invalid coordinate. Please try again:");
+            return false;
+        // check for "free" or "mine" as String input
+        } else if (!freeOrMine.equalsIgnoreCase("free") && !freeOrMine.equalsIgnoreCase("mine")) {
+            System.out.println("You must enter either \"free\" or \"mine\" as input. Please try again:");
+            return false;
+        }
+        return true;
+    }
+
+    protected void updateGameBoardWithFreeCoordinates(GameBoard gameBoardKey, int convertedCoordinate) {
+        getGameBoard()[convertedCoordinate] = gameBoardKey.getGameBoard()[convertedCoordinate];
+    }
+
+    protected void updateGameBoardWithMineCoordinates(int convertedCoordinate) {
         char[] updatedGameBoard = new char[gameBoardWidth * gameBoardHeight];
 
         for (int i = 0; i < updatedGameBoard.length; i++) {
-            if (i == coordinate) {
+            if (i == convertedCoordinate) {
                 if (getGameBoard()[i] == '*') {
                     updatedGameBoard[i] = '.';
-                    if (getMineIndices().contains(coordinate)) {
-                        getMineIndices().remove(Integer.valueOf(coordinate));
+                    if (getMineIndices().contains(convertedCoordinate)) {
+                        getMineIndices().remove(Integer.valueOf(convertedCoordinate));
                     } else {
-                        getMineIndices().add(coordinate);
+                        getMineIndices().add(convertedCoordinate);
                     }
 
                 } else {
                     updatedGameBoard[i] = '*';
-                    if (getMineIndices().contains(coordinate)) {
-                        getMineIndices().remove(Integer.valueOf(coordinate));
+                    if (getMineIndices().contains(convertedCoordinate)) {
+                        getMineIndices().remove(Integer.valueOf(convertedCoordinate));
                     } else {
-                        getMineIndices().add(coordinate);
+                        getMineIndices().add(convertedCoordinate);
                     }
                 }
             } else {
@@ -184,15 +121,13 @@ public class GameBoard {
 
     // get user input for mines
 
-    private void getNumberOfMines() {
+    protected int getNumberOfMines() {
         System.out.println("How many mines do you want on the field?");
 
-        int numOfMines = scanner.nextInt();
-
-        generateMines(numOfMines);
+        return scanner.nextInt();
     }
 
-    private void generateMines(int numOfMines) {
+    protected void generateMines(int numOfMines, int firstUserCoordinate) {
         Random random = new Random();
         int upperBound = gameBoardWidth * gameBoardHeight;
 
@@ -200,6 +135,9 @@ public class GameBoard {
 
         while (newMineIndices.size() != numOfMines) {
             int currentRandomNumber = random.nextInt(upperBound);
+            while (currentRandomNumber == firstUserCoordinate) {
+                currentRandomNumber = random.nextInt(upperBound);
+            }
             if (!newMineIndices.contains(currentRandomNumber)) {
                 newMineIndices.add(currentRandomNumber);
             }
@@ -208,12 +146,12 @@ public class GameBoard {
         setMineIndices(newMineIndices);
     }
 
-    private void updateGameBoardWithMines() {
+    protected void updateGameBoardWithMines() {
         char[] updatedGameBoard = new char[gameBoardWidth * gameBoardHeight];
 
         for (int i = 0; i < updatedGameBoard.length; i++) {
             if (getGameBoard()[i] == 'X') {
-                updatedGameBoard[i] = '.';
+                updatedGameBoard[i] = 'X';
             } else {
                 int numOfMines = getNumberOfMines(i);
                 updatedGameBoard[i] = numOfMines == 0 ? getGameBoard()[i] : (char) (numOfMines + '0'); // converts int to char
@@ -457,15 +395,15 @@ public class GameBoard {
     // getters and setters
 
 
-    public boolean isGameOver() {
+    protected boolean isGameOver() {
         return isGameOver;
     }
 
-    public void setGameOver(boolean gameOver) {
+    protected void setGameOver(boolean gameOver) {
         isGameOver = gameOver;
     }
 
-    private char[] getGameBoard() {
+    protected char[] getGameBoard() {
         return gameBoard;
     }
 
@@ -473,19 +411,11 @@ public class GameBoard {
         this.gameBoard = gameBoard;
     }
 
-    private ArrayList<Integer> getMineIndices() {
+    protected ArrayList<Integer> getMineIndices() {
         return mineIndices;
     }
 
     private void setMineIndices(ArrayList<Integer> mineIndices) {
         this.mineIndices = mineIndices;
-    }
-
-    public char[][] getUserGameBoard() {
-        return userGameBoard;
-    }
-
-    public void setUserGameBoard(char[][] userGameBoard) {
-        this.userGameBoard = userGameBoard;
     }
 }

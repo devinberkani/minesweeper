@@ -11,6 +11,8 @@ public class GameBoard {
     private char[] gameBoard = new char[gameBoardWidth * gameBoardHeight];
     private ArrayList<Integer> mineIndices = new ArrayList<>();
 
+    private ArrayList<Integer> allUserIndices = new ArrayList<>();
+
     public GameBoard() {
     }
 
@@ -97,18 +99,18 @@ public class GameBoard {
             if (i == convertedCoordinate) {
                 if (getGameBoard()[i] == '*') {
                     updatedGameBoard[i] = '.';
-                    if (getMineIndices().contains(convertedCoordinate)) {
-                        getMineIndices().remove(Integer.valueOf(convertedCoordinate));
+                    if (getAllUserIndices().contains(convertedCoordinate)) {
+                        getAllUserIndices().remove(Integer.valueOf(convertedCoordinate));
                     } else {
-                        getMineIndices().add(convertedCoordinate);
+                        getAllUserIndices().add(convertedCoordinate);
                     }
 
                 } else {
                     updatedGameBoard[i] = '*';
-                    if (getMineIndices().contains(convertedCoordinate)) {
-                        getMineIndices().remove(Integer.valueOf(convertedCoordinate));
+                    if (getAllUserIndices().contains(convertedCoordinate)) {
+                        getAllUserIndices().remove(Integer.valueOf(convertedCoordinate));
                     } else {
-                        getMineIndices().add(convertedCoordinate);
+                        getAllUserIndices().add(convertedCoordinate);
                     }
                 }
             } else {
@@ -132,6 +134,7 @@ public class GameBoard {
         int upperBound = gameBoardWidth * gameBoardHeight;
 
         ArrayList<Integer> newMineIndices = new ArrayList<>();
+        ArrayList<Integer> allUserIndices = new ArrayList<>();
 
         while (newMineIndices.size() != numOfMines) {
             int currentRandomNumber = random.nextInt(upperBound);
@@ -140,10 +143,12 @@ public class GameBoard {
             }
             if (!newMineIndices.contains(currentRandomNumber)) {
                 newMineIndices.add(currentRandomNumber);
+                allUserIndices.add(currentRandomNumber);
             }
         }
 
         setMineIndices(newMineIndices);
+        setAllUserIndices(allUserIndices);
     }
 
     protected void updateGameBoardWithMines() {
@@ -407,7 +412,7 @@ public class GameBoard {
         return gameBoard;
     }
 
-    private void setGameBoard(char[] gameBoard) {
+    protected void setGameBoard(char[] gameBoard) {
         this.gameBoard = gameBoard;
     }
 
@@ -417,5 +422,13 @@ public class GameBoard {
 
     private void setMineIndices(ArrayList<Integer> mineIndices) {
         this.mineIndices = mineIndices;
+    }
+
+    protected ArrayList<Integer> getAllUserIndices() {
+        return allUserIndices;
+    }
+
+    protected void setAllUserIndices(ArrayList<Integer> allUserIndices) {
+        this.allUserIndices = allUserIndices;
     }
 }

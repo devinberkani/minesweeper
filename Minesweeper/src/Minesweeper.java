@@ -15,12 +15,13 @@ public class Minesweeper {
 
         // initialize user game board
         userGameBoard.initializeGameBoard();
-        userGameBoard.printGameBoard();
+//        userGameBoard.printGameBoard();
 
         while(!gameBoardKey.isGameOver()) {
             gameBoardKey.printGameBoard();
             userGameBoard.printGameBoard();
-            System.out.println(gameBoardKey.getMineIndices());
+//            System.out.println("remaining mine indices: " + gameBoardKey.getMineIndices());
+//            System.out.println("remaining all user indices " + gameBoardKey.getAllUserIndices());
             getUserInput(numOfMines);
             if (checkForWinner()) {
                 gameBoardKey.setGameOver(true);
@@ -82,62 +83,90 @@ public class Minesweeper {
                 gameBoardKey.setGameOver(true);
                 // check if location is a number or not
             } else if (location == '.') {
-                floodFill(coordinateOne, coordinateTwo);
+                // convert game boards to multi dimensional arrays
+                char[][] multiGameKey = convertToMultiDimensionalArray(gameBoardKey.getGameBoard());
+                char[][] multiUser = convertToMultiDimensionalArray(userGameBoard.getGameBoard());
+                floodFill(multiGameKey, multiUser, coordinateOne - 1, coordinateTwo - 1);
+                // change game boards back to single dimensional arrays
+                gameBoardKey.setGameBoard(convertToSingleDimensionalArray(multiGameKey));
+                userGameBoard.setGameBoard(convertToSingleDimensionalArray(multiUser));
             } else {
                 userGameBoard.updateGameBoardWithFreeCoordinates(gameBoardKey, convertedCoordinate);
             }
         } else {
             gameBoardKey.updateGameBoardWithMineCoordinates(convertedCoordinate);
             userGameBoard.updateGameBoardWithMineCoordinates(convertedCoordinate);
-            gameBoardKey.setGameOver(gameBoardKey.getMineIndices().size() == 0);
+            gameBoardKey.setGameOver(gameBoardKey.getAllUserIndices().size() == 0);
         }
     }
 
-    private void floodFill(int coordinateOne, int coordinateTwo) {
-        System.out.println("in flood fill");
-        char oldValOne = '.';
-        char oldValTwo = 'X';
+    private void floodFill(char[][] multiGameKey, char[][] multiUser, int coordinateOne, int coordinateTwo) {
+        char oldVal = '.';
         char newVal = '/';
 
-        int convertedCoordinate = gameBoardKey.gameBoardWidth * (coordinateTwo - 1) + (coordinateOne - 1);
-
-        System.out.println("converted coordinate is " + convertedCoordinate);
-
-        // make sure coordinate is in bounds
-        if (convertedCoordinate < 0 || convertedCoordinate >= gameBoardKey.getGameBoard().length) {
+        if (coordinateOne < 0 || coordinateOne >= 9 || coordinateTwo < 0 || coordinateTwo >= 9) {
             return;
         }
 
         // make sure the current position equals the old value
-        if (gameBoardKey.getGameBoard()[convertedCoordinate] != oldValOne) {
-//            userGameBoard.getGameBoard()[convertedCoordinate] = gameBoardKey.getGameBoard()[convertedCoordinate];
+        if (multiGameKey[coordinateTwo][coordinateOne] != oldVal) {
+            // YOU NEED TO FIX THIS -- LOOK AT ERROR IN HYPERSKILL SUBMISSION
+            multiUser[coordinateTwo][coordinateOne] = multiGameKey[coordinateTwo][coordinateOne];
             return;
         }
 
-        gameBoardKey.getGameBoard()[convertedCoordinate] = newVal;
-        userGameBoard.getGameBoard()[convertedCoordinate] = newVal;
+        multiGameKey[coordinateTwo][coordinateOne] = newVal;
+        multiUser[coordinateTwo][coordinateOne] = newVal;
 
-        floodFill(coordinateOne + 1, coordinateTwo);
-        floodFill(coordinateOne - 1, coordinateTwo);
-        floodFill(coordinateOne, coordinateTwo + 1);
-        floodFill(coordinateOne, coordinateTwo - 1);
+        floodFill(multiGameKey, multiUser, coordinateOne - 1, coordinateTwo - 1); // 4 4
+        floodFill(multiGameKey, multiUser, coordinateOne - 1, coordinateTwo); // 4 5
+        floodFill(multiGameKey, multiUser, coordinateOne - 1, coordinateTwo + 1); // 4 6
+        floodFill(multiGameKey, multiUser, coordinateOne, coordinateTwo - 1); // 5 4
+        floodFill(multiGameKey, multiUser, coordinateOne, coordinateTwo + 1); // 5 6
+        floodFill(multiGameKey, multiUser, coordinateOne + 1, coordinateTwo - 1); // 6 4
+        floodFill(multiGameKey, multiUser, coordinateOne + 1, coordinateTwo); // 6 5
+        floodFill(multiGameKey, multiUser, coordinateOne + 1, coordinateTwo + 1); // 6 6
+    }
 
+    private char[][] convertToMultiDimensionalArray(char[] gameBoard) {
+
+        char[][] convertedGameBoard = new char[gameBoardKey.gameBoardWidth][gameBoardKey.gameBoardHeight];
+
+        int index = 0;
+        for (int i = 0; i < convertedGameBoard.length; i++) {
+            for (int j = 0; j < convertedGameBoard[i].length; j++) {
+                convertedGameBoard[i][j] = gameBoard[index];
+                index++;
+            }
+        }
+
+        return convertedGameBoard;
+    }
+
+    private char[] convertToSingleDimensionalArray(char[][] gameBoard) {
+
+        char[] convertedGameBoard = new char[gameBoardKey.gameBoardHeight * gameBoardKey.gameBoardWidth];
+
+        int index = 0;
+        for (int i = 0; i < gameBoard.length; i++) {
+            for (int j = 0; j < gameBoard[i].length; j++) {
+                convertedGameBoard[index] = gameBoard[i][j];
+                index++;
+            }
+        }
+
+        return convertedGameBoard;
     }
 
     private boolean checkForWinner() {
 
-        for (int mineIndex : gameBoardKey.getMineIndices()) {
-            if (gameBoardKey.getGameBoard()[mineIndex] != '.') {
-                return false;
+        for (int i = 0; i < userGameBoard.getGameBoard().length; i++) {
+            if (!gameBoardKey.getMineIndices().contains(i)) {
+                if (userGameBoard.getGameBoard()[i] == '.') {
+                    return false;
+                }
             }
         }
-
-        for (int i = 0; i < gameBoardKey.getGameBoard().length; i++) {
-            if (gameBoardKey.getGameBoard()[i] == '.') {
-                return false;
-            }
-        }
-
         return true;
     }
 

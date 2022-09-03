@@ -97,21 +97,29 @@ public class GameBoard {
 
         for (int i = 0; i < updatedGameBoard.length; i++) {
             if (i == convertedCoordinate) {
+                updatedGameBoard[i] = getGameBoard()[i];
+                if (getAllUserIndices().contains(convertedCoordinate)) {
+                    getAllUserIndices().remove(Integer.valueOf(convertedCoordinate));
+                } else {
+                    getAllUserIndices().add(convertedCoordinate);
+                }
+            } else {
+                updatedGameBoard[i] = getGameBoard()[i];
+            }
+        }
+
+        setGameBoard(updatedGameBoard);
+    }
+
+    protected void updateGameBoardWithAsterisks(int convertedCoordinate) {
+        char[] updatedGameBoard = new char[gameBoardWidth * gameBoardHeight];
+
+        for (int i = 0; i < updatedGameBoard.length; i++) {
+            if (i == convertedCoordinate) {
                 if (getGameBoard()[i] == '*') {
                     updatedGameBoard[i] = '.';
-                    if (getAllUserIndices().contains(convertedCoordinate)) {
-                        getAllUserIndices().remove(Integer.valueOf(convertedCoordinate));
-                    } else {
-                        getAllUserIndices().add(convertedCoordinate);
-                    }
-
                 } else {
                     updatedGameBoard[i] = '*';
-                    if (getAllUserIndices().contains(convertedCoordinate)) {
-                        getAllUserIndices().remove(Integer.valueOf(convertedCoordinate));
-                    } else {
-                        getAllUserIndices().add(convertedCoordinate);
-                    }
                 }
             } else {
                 updatedGameBoard[i] = getGameBoard()[i];

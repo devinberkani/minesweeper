@@ -24,17 +24,17 @@ There are two possible ways to win:
 
 The following symbols represent each cell's state:
 
-**.** as unexplored cells
-**/** as explored free cells without mines around it
-**Numbers from 1 to 8** as explored free cells with 1 to 8 mines around them, respectively
+**.** as unexplored cells<br/>
+**/** as explored free cells without mines around it<br/>
+**Numbers from 1 to 8** as explored free cells with 1 to 8 mines around them, respectively<br/>
 **&ast;** as marked cells
 
 ## Instructions
 
 First, the user will be prompted to enter the number of mines they would like on the playing field (I recommend 10 or more for the game to actually be challenging). Next, simply enter coordinates for where you'd like to make your move (y, x), followed by either "free" to mark a free cell, or "mine" to place a mine marker.
 
-**Example #1:** 1 1 free - *marks the coordinate y1, x1 as free*<br/>
-**Example #2:** 5 5 mine - *marks the coording y5, x5 with a mine marker OR removes the mine marker if one is already there*<br/>
+**Example #1:** 1 1 free - *marks the coordinate (y1, x1) as free*<br/>
+**Example #2:** 5 5 mine - *marks the coording (y5, x5) with a mine marker OR removes the mine marker if one is already there*<br/>
 
 ## Additional Info
 
